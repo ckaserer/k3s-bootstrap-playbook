@@ -1,0 +1,21 @@
+
+---
+- hosts: k3s
+  gather_facts: no
+  tasks:
+  - name: shutdown
+    command: /sbin/shutdown -h -t 1
+    become: yes
+
+  - name: wait go down
+    local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped
+
+- hosts: bastion
+  gather_facts: no
+  tasks:
+  - name: shutdown
+    command: /sbin/shutdown -h -t 1
+    become: yes
+
+  - name: wait go down
+    local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped

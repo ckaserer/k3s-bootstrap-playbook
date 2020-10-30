@@ -1,0 +1,84 @@
+---
+
+# authorized_keys
+
+authorization_list:
+  - name: pi
+    ssh_keys:
+      - k3s_id_rsa
+
+create_backup: true
+exclusive_authorized_keys: true
+fail_when_user_not_found: true
+restore_authorized_keys: false
+select_public_keys_from_path: "./"
+
+# k3s_bastion config
+bastion_hostname: "bastion"
+dhcpcd_interface: "eth0"
+dhcpcd_ip_address: "10.0.0.1/24"
+
+# dhcp config
+dhcp_global_authoritative: authoritative
+dhcp_global_default_lease_time: 28800   # 8hrs
+dhcp_global_max_lease_time: 43200       # 12 hrs
+dhcp_global_routers: 10.0.0.1
+dhcp_global_domain_name: example.com
+dhcp_global_domain_name_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+dhcp_interface: eth0      
+dhcp_subnets:
+  - ip: 10.0.0.0
+    netmask: 255.255.255.0
+    domain_name_servers:
+      - 10.0.0.1
+    range_begin: 10.0.0.70
+    range_end: 10.0.0.250
+dhcp_hosts:
+  - name: k3s
+    mac: 'dc:a6:32:be:c7:a5'
+    ip: 10.0.0.1
+  - name: master-0
+    mac: 'dc:a6:32:b1:17:b6'
+    ip: 10.0.0.10
+  - name: worker-0
+    mac: 'dc:a6:32:b1:17:c8'
+    ip: 10.0.0.20  
+dhcp6_enable: false
+
+# bind config
+
+bind_allow_query:
+  - any
+bind_listen_ipv4:
+  - any
+bind_listen_ipv6:
+  - any
+bind_forwarders:
+  - '8.8.8.8'
+  - '8.8.4.4'
+bind_recursion: true
+bind_query_log: 'data/query.log'
+bind_check_names: 'master ignore'
+bind_zone_master_server_ip: "10.0.0.1"
+bind_zone_minimum_ttl: "2D"
+bind_zone_ttl: "2W"
+bind_zone_time_to_refresh: "2D"
+bind_zone_time_to_retry: "2H"
+bind_zone_time_to_expire: "2W"
+bind_zones:
+  - name: 'k3s'
+    networks:
+      - '10.0.0'
+    primaries:
+      - '10.0.0.1'
+    hostmaster_email: "office@geaprdec.com"
+    hosts:
+      - name: bastion
+        ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+        aliases:
+          - "*.apps"
+          - api
+
+...
