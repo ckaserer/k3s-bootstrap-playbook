@@ -1,12 +1,15 @@
 version: "~> 1.0"
 os: linux
+dist: bionic
 arch:
 - amd64
 language: python
 python:
 - '3.6'
-services:
-- docker
+cache:
+  pip: true
+  directories:
+    - "/home/travis/.vagrant.d/boxes"
 notifications:
   email:
     on_success: never
@@ -22,6 +25,15 @@ notifications:
     on_success: change
     on_failure: always
 install:
+- sudo apt-get update && sudo apt-get install -y bridge-utils dnsmasq-base ebtables
+  libvirt-bin libvirt-dev qemu-kvm qemu-utils ruby-dev
+- vagrant_version=$(curl https://releases.hashicorp.com/vagrant/ | grep href | grep -v '\.\.' | 
+  head -1 | sed -E 's/.*([[:digit:]]+(\.[[:digit:]]+(\.[[:digit:]]+)+)+).*/\1/') && 
+  wget -nv https://releases.hashicorp.com/vagrant/${vagrant_version}/vagrant_${vagrant_version}_x86_64.deb
+- sudo dpkg -i vagrant_${vagrant_version}_x86_64.deb
+- sudo chown -R ${USER}:${USER} /home/travis /opt/vagrant/embedded/gems /var/run/libvirt
+- vagrant --version
+- vagrant plugin install vagrant-libvirt
 - pip install -r requirements.txt
 - ansible-galaxy install -r requirements.yml -f
 - curl -Lo /tmp/merge.sh https://raw.githubusercontent.com/ckaserer/git-merge-script/master/merge.sh
@@ -30,12 +42,7 @@ env:
   global:
   - secure: H/OddULPwKshhPTbos7Oft10ud0Q/HThjdRXMBTSSdLDEjW/Khsmwkxud1xKCt53cEyOTT209AFBNtEEuDg5svWNIQFgXLXihiD/5NeNE45ZQuHEvJS0qa1TpbwDc8aIyq15rX23TOh1MnlpabX6jXSk1Suk0zXYE9GVpkwA7wAsUaSlyDnABlqlVbUtnjDeM50qT+WJ8bFJI651FJx3XS0R/ue/jVnp9a9Umn5rn4I+eBB2FXuo05GOLua9J4UkBfsfKIUiU8PzYGG+bxWK9EZqZ2Ivcisr04Xj59UETB88MI7QljDzBnjrfB2WGxvR6Wbo40vbC8pmxpoyqt6nC1WqpxhTra4a4kGDAKu0UQAZZnhgmpRY2xcN7dclST2Ab/XK05nT37WMdlq+nA3P0y/aAbeA4XyS45FNHWw+VJmOVaKa1EpTEfcxRTW47oLebpZOEJkYOeIw5RM72Q7Q3E9jTmiVQ8BtR+5GAj1k1go98OkMnWDghXD+OGRrMmYUJOLhr/oNkhvmoavrS4lGpcW2zEpRBONGcW7eGaV98+A//l/c7HI6ABElYSKfYgX2nPN3Gy3ej5xKYSvxxIacoG2MS5x1OzkcYiKRQt964GHtI92rgHwnhfmjjwM+0LEYOx1M6hf1D4WM9XlGlC7/aNrzSo1FhaHccG1hsANHNQk=
 script:
-- cp .ci/config.yml config.yml
-- docker run --rm -d --name instance --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro
-  -v $(pwd):/mnt --tmpfs /run --tmpfs /tmp geerlingguy/docker-debian10-ansible /lib/systemd/systemd
-- docker exec -it instance ansible-galaxy install -r /mnt/requirements.yml
-- docker exec -it instance ansible-playbook /mnt/playbook.yml -i /mnt/.ci/hosts.ini
-  --skip-tags notest
+- vagrant up
 after_success:
 - |
   BRANCHES_TO_MERGE_REGEX='^develop' \

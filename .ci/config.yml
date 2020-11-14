@@ -3,4 +3,7 @@
 
 # ckaserer.dhcpcd
 bastion_dhcpcd_reboot: false
+
+# ckaserer.dhcp
+dhcp_interface: eth1
 ...

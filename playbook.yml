@@ -1,13 +1,30 @@
 ---
 
 - name: Prepare
-  hosts: bootstrap
+  hosts: bastion
+  gather_facts: false
   become: true
   tasks:
 
     - name: Install sshpass
-      apt:
+      local_action:
+        module: apt
         name: sshpass
+      run_once: True
+
+    - name: Ensure known_hosts are set
+      local_action:
+        module: lineinfile
+        dest: ~/.ssh/known_hosts
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa '+inventory_hostname) }}"
+        regexp: "^{{ inventory_hostname }}"
+      run_once: true
+
+- name: Known hosts
+  hosts: bastion
+  gather_facts: false
       
 - name: Bootstrap Bastion
   hosts: bastion
@@ -22,15 +39,6 @@
         - "{{ playbook_dir }}/config.yml"
       tags: ['always']
 
-    - name: Ensure known_hosts are set
-      lineinfile:
-        dest: ~/.ssh/known_hosts
-        create: yes
-        state: present
-        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa '+inventory_hostname) }}"
-        regexp: "^{{ inventory_hostname }}"
-      delegate_to: localhost
-
     - name: "Set hostname to {{ bastion_hostname }}"
       hostname:
         name: "{{ bastion_hostname }}"
@@ -43,22 +51,13 @@
         dhcpcd_interface: "{{ bastion_dhcpcd_interface }}"
         dhcpcd_ip_address: "{{ bastion_dhcpcd_ip_address }}"
         reboot: "{{ bastion_dhcpcd_reboot }}"
+      tags:
+        - notest
     - role: ckaserer.k3s_iptables
       tags:
         - notest
-         
-  #   - community.crypto.openssh_keypair:
-  #       path: ./k3s_id_rsa
-  #       comment: k3s
-  #       size: 4096
-  #       state: present
-  #       type: rsa
-  #     delegate_to: 127.0.0.1
-
-  # roles:
-  #   - ckaserer.authorized_keys
-  #   - ckaserer.dhcp
-  #   - bertvv.bind
-  #   - ckaserer.k3s_haproxy
+    - role: bertvv.bind
+    - role: ckaserer.dhcp
+#   - role: ckaserer.haproxy
 
 ...
