@@ -1,18 +1,21 @@
 ---
 
-# pre_tasks
+# global
 bastion_hostname: k3s-bastion
+bastion_ip: "10.0.0.1"
+
+# pre_tasks
 
 # ckaserer.dhcpcd
 bastion_dhcpcd_interface: "eth0"
-bastion_dhcpcd_ip_address: "10.0.0.1/24"
+bastion_dhcpcd_ip_address: "{{ bastion_ip }}/24"
 bastion_dhcpcd_reboot: true
 
 # ckaserer.dhcp
 dhcp_global_authoritative: authoritative
 dhcp_global_default_lease_time: 28800   # 8hrs
 dhcp_global_max_lease_time: 43200       # 12 hrs
-dhcp_global_routers: 10.0.0.1
+dhcp_global_routers: "{{ bastion_ip }}"
 dhcp_global_domain_name: example.com
 dhcp_global_domain_name_servers:
   - 8.8.8.8
@@ -22,13 +25,13 @@ dhcp_subnets:
   - ip: 10.0.0.0
     netmask: 255.255.255.0
     domain_name_servers:
-      - 10.0.0.1
+      - "10.0.0.1"
     range_begin: 10.0.0.70
     range_end: 10.0.0.250
 dhcp_hosts:
   - name: k3s
     mac: 'dc:a6:32:be:c7:a5'
-    ip: 10.0.0.1
+    ip: "10.0.0.1"
   - name: master-0
     mac: 'dc:a6:32:b1:17:b6'
     ip: 10.0.0.10
@@ -53,7 +56,7 @@ bind_forwarders:
 bind_recursion: true
 bind_query_log: 'data/query.log'
 bind_check_names: 'master ignore'
-bind_zone_master_server_ip: "10.0.0.1"
+bind_zone_master_server_ip: "{{ bastion_ip }}"
 bind_zone_minimum_ttl: "2D"
 bind_zone_ttl: "2W"
 bind_zone_time_to_refresh: "2D"
@@ -64,7 +67,7 @@ bind_zones:
     networks:
       - '10.0.0'
     primaries:
-      - '10.0.0.1'
+      - '{{ bastion_ip }}'
     hostmaster_email: "noreply@no.reply"
     hosts:
       - name: "{{ bastion_hostname }}"
