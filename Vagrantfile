@@ -6,7 +6,7 @@ $CPU = 1
 $MEMORY = 512
 $CPUEXECUTIONCAP = 50 # does not work with hyper-v
 $IP = "10.0.0.2"   # does not work with hyper-v # https://www.vagrantup.com/docs/hyperv/limitations.html
-$BASEOS = "ubuntu/xenial32"
+$BASEOS = "generic/debian10"
 $SSH=2224
 $HOSTNAME="k3s-bastion"
 #########################

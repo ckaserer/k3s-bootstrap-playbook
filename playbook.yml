@@ -14,12 +14,11 @@
 
     - name: Ensure known_hosts are set
       local_action:
-        module: lineinfile
-        dest: ~/.ssh/known_hosts
+        module: blockinfile
+        path: ~/.ssh/known_hosts
         create: yes
         state: present
-        line: "{{ lookup('pipe', 'ssh-keyscan -t ecdsa '+inventory_hostname) }}"
-        regexp: "^{{ inventory_hostname }}"
+        block: "{{ lookup('pipe', 'ssh-keyscan '+inventory_hostname) }}"
       run_once: true
       
 - name: Bootstrap Bastion
