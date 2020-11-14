@@ -5,6 +5,9 @@ bastion_ip: "10.0.0.2"
 
 # pre_tasks
 
+# ckaserer.dhcpcd
+bastion_dhcpcd_reboot: false
+
 # ckaserer.dhcp
 dhcp_interface: eth1
 ...
