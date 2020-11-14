@@ -37,12 +37,14 @@ Vagrant.configure("2") do |config|
     node.vm.network "forwarded_port", guest: 22, host: $SSH, id: 'ssh'
     
     node.vm.synced_folder ".", "/vagrant", type: "rsync" #type: "nfs"
-  
+
     node.vm.provision "shell" do |shell|
       shell.path = ".ci/vagrant-ssh-setup.sh"
+      shell.privileged = true
     end
     node.vm.provision "shell" do |shell|
       shell.path = ".ci/vagrant-prepare.sh"
+      shell.privileged = true
     end
   
   end
@@ -71,12 +73,14 @@ Vagrant.configure("2") do |config|
     #node.vm.network "forwarded_port", guest: 22, host: 2222, id: 'ssh'
   
     node.vm.synced_folder ".", "/vagrant", type: "rsync" #type: "nfs"
-    
+     
     node.vm.provision "shell" do |shell|
       shell.path = ".ci/vagrant-ssh-setup.sh"
+      shell.privileged = true
     end
     node.vm.provision "shell" do |shell|
       shell.path = ".ci/vagrant-prepare.sh"
+      shell.privileged = true
     end
   
     node.vm.provision "ansible_local" do |ansible|

@@ -34,6 +34,13 @@
         - "{{ playbook_dir }}/config.yml"
       tags: ['always']
 
+    - name: System update
+      apt:
+        name: "*"
+        state: latest
+        update_cache: true
+        cache_valid_time: 3600
+
     - name: "Set hostname to {{ bastion_hostname }}"
       hostname:
         name: "{{ bastion_hostname }}"
