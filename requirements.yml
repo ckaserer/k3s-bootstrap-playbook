@@ -4,7 +4,7 @@ roles:
   - name: ckaserer.dhcp
   - name: ckaserer.dhcpcd
   - name: ckaserer.k3s_iptables
-#  - name: ckaserer.haproxy
+  - name: ckaserer.haproxy
   
 collections: []
 ...

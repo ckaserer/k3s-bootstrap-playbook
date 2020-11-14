@@ -42,6 +42,8 @@ env:
   global:
   - secure: H/OddULPwKshhPTbos7Oft10ud0Q/HThjdRXMBTSSdLDEjW/Khsmwkxud1xKCt53cEyOTT209AFBNtEEuDg5svWNIQFgXLXihiD/5NeNE45ZQuHEvJS0qa1TpbwDc8aIyq15rX23TOh1MnlpabX6jXSk1Suk0zXYE9GVpkwA7wAsUaSlyDnABlqlVbUtnjDeM50qT+WJ8bFJI651FJx3XS0R/ue/jVnp9a9Umn5rn4I+eBB2FXuo05GOLua9J4UkBfsfKIUiU8PzYGG+bxWK9EZqZ2Ivcisr04Xj59UETB88MI7QljDzBnjrfB2WGxvR6Wbo40vbC8pmxpoyqt6nC1WqpxhTra4a4kGDAKu0UQAZZnhgmpRY2xcN7dclST2Ab/XK05nT37WMdlq+nA3P0y/aAbeA4XyS45FNHWw+VJmOVaKa1EpTEfcxRTW47oLebpZOEJkYOeIw5RM72Q7Q3E9jTmiVQ8BtR+5GAj1k1go98OkMnWDghXD+OGRrMmYUJOLhr/oNkhvmoavrS4lGpcW2zEpRBONGcW7eGaV98+A//l/c7HI6ABElYSKfYgX2nPN3Gy3ej5xKYSvxxIacoG2MS5x1OzkcYiKRQt964GHtI92rgHwnhfmjjwM+0LEYOx1M6hf1D4WM9XlGlC7/aNrzSo1FhaHccG1hsANHNQk=
 script:
+- chmod +x .ci/vagrant-ssh-keygen.sh
+- .ci/vagrant-ssh-keygen.sh
 - vagrant up
 after_success:
 - |

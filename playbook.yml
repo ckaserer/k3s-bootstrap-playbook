@@ -58,6 +58,6 @@
         - notest
     - role: bertvv.bind
     - role: ckaserer.dhcp
-#   - role: ckaserer.haproxy
+    - role: ckaserer.haproxy
 
 ...
