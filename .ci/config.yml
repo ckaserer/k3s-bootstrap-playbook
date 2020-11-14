@@ -1,0 +1,6 @@
+---
+# pre_tasks
+
+# ckaserer.dhcpcd
+bastion_dhcpcd_reboot: false
+...

@@ -1,0 +1,45 @@
+---
+
+- hosts: bastion
+  become: true
+
+  vars_files:
+    - default.config.yml
+
+  pre_tasks:
+    - include_vars: "{{ item }}"
+      with_fileglob:
+        - "{{ playbook_dir }}/config.yml"
+      tags: ['always']
+
+    - name: "Set hostname to {{ bastion_hostname }}"
+      hostname:
+        name: "{{ bastion_hostname }}"
+      tags:
+        - notest
+
+  roles:
+    - role: ckaserer.dhcpcd
+      vars:
+        dhcpcd_interface: "{{ bastion_dhcpcd_interface }}"
+        dhcpcd_ip_address: "{{ bastion_dhcpcd_ip_address }}"
+        reboot: "{{ bastion_dhcpcd_reboot }}"
+    - role: ckaserer.k3s_iptables
+      tags:
+        - notest
+         
+  #   - community.crypto.openssh_keypair:
+  #       path: ./k3s_id_rsa
+  #       comment: k3s
+  #       size: 4096
+  #       state: present
+  #       type: rsa
+  #     delegate_to: 127.0.0.1
+
+  # roles:
+  #   - ckaserer.authorized_keys
+  #   - ckaserer.dhcp
+  #   - bertvv.bind
+  #   - ckaserer.k3s_haproxy
+
+...

@@ -1,8 +1,14 @@
 ---
-- name: ckaserer.authorized_keys
-- name: ckaserer.dhcp
-- name: ckaserer.k3s_bastion
-  version: 1.0.0
-- name: ckaserer.k3s_iptables
-- name: ckaserer.k3s_haproxy
-- name: bertvv.bind
+roles:
+  - name: ckaserer.dhcpcd
+  - name: ckaserer.k3s_iptables
+
+collections: []
+...
+
+# - name: ckaserer.authorized_keys
+# - name: ckaserer.dhcp
+# - name: ckaserer.k3s_bastion
+#   version: 1.0.0
+# - name: ckaserer.k3s_haproxy
+# - name: bertvv.bind

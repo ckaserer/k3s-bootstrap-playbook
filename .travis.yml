@@ -1,0 +1,45 @@
+version: "~> 1.0"
+os: linux
+arch:
+- amd64
+language: python
+python:
+- '3.6'
+services:
+- docker
+notifications:
+  email:
+    on_success: never
+    on_failure: never
+  slack:
+    if: branch = master
+    rooms:
+      secure: ZUJnOQVR4vSjztk2VNO9U0ywjuA7QKFU1/v30zAPgl57WtYmwvAe8xsAVV2B1CkXz8aJdV0dWZ99taY0RwqhQS0ari+kVsLyImXLEOcM02I/dQ0XX1sAByOPSBpkNub/mk3kZDDfZmcnUJU8czF8QGpSLZjrYauZAMdZOTY+zcedWdGyXxZQWnxvMtxtsQNK+DEQ+wFX5f0cY/FSWxXBZ56Gz/RXfZ5G5hRMLgYGjC/2S/JSe7NSxlQB6Ep9xtNgFKJHR6OsvhP6tcnqd5G1MVscX/vjZueIamQa63mnIdf24UQ7Of7ppE1dB/BWzXhxrRklz3j1RjyUztm+mKQeOGD63/0T6gFmN4LOOMLyn69LVfqoRmx5pLZf4qifiXnmSUKVp+/J+yxenGPSExhwBi8CzX4CqIR54z7brfANcDMvowXKs4vU8K6zV/0Xdl9c46MjmU82kIrGITft0sqDidULjvcaQ0n2DvXe/yEfrJuBIkS/ajdqbXhq8CD1dWsOe3sbNvJAXLy70Yk3E4kcj3TEIV5UM9hm0ES3IbggCXlg+mOJ6I6zNByIFncbEXoUx1mNBlI2dPYOXnyC/I30vLzsOHT9ZMuCGk/jGfph0xpBPIk3b5pazruCfIUQYsC+SjYBrqgCciufpVc0JDoM+us8bRiphW+ZpV/nbdy2r4I=
+    template:
+    - "%{commit_subject}"
+    - build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) @%{branch}
+    - by %{author} %{result} in %{duration}
+    on_success: change
+    on_failure: always
+install:
+- pip install -r requirements.txt
+- ansible-galaxy install -r requirements.yml -f
+- curl -Lo /tmp/merge.sh https://raw.githubusercontent.com/ckaserer/git-merge-script/master/merge.sh
+- chmod a+x /tmp/merge.sh
+env:
+  global:
+  - secure: H/OddULPwKshhPTbos7Oft10ud0Q/HThjdRXMBTSSdLDEjW/Khsmwkxud1xKCt53cEyOTT209AFBNtEEuDg5svWNIQFgXLXihiD/5NeNE45ZQuHEvJS0qa1TpbwDc8aIyq15rX23TOh1MnlpabX6jXSk1Suk0zXYE9GVpkwA7wAsUaSlyDnABlqlVbUtnjDeM50qT+WJ8bFJI651FJx3XS0R/ue/jVnp9a9Umn5rn4I+eBB2FXuo05GOLua9J4UkBfsfKIUiU8PzYGG+bxWK9EZqZ2Ivcisr04Xj59UETB88MI7QljDzBnjrfB2WGxvR6Wbo40vbC8pmxpoyqt6nC1WqpxhTra4a4kGDAKu0UQAZZnhgmpRY2xcN7dclST2Ab/XK05nT37WMdlq+nA3P0y/aAbeA4XyS45FNHWw+VJmOVaKa1EpTEfcxRTW47oLebpZOEJkYOeIw5RM72Q7Q3E9jTmiVQ8BtR+5GAj1k1go98OkMnWDghXD+OGRrMmYUJOLhr/oNkhvmoavrS4lGpcW2zEpRBONGcW7eGaV98+A//l/c7HI6ABElYSKfYgX2nPN3Gy3ej5xKYSvxxIacoG2MS5x1OzkcYiKRQt964GHtI92rgHwnhfmjjwM+0LEYOx1M6hf1D4WM9XlGlC7/aNrzSo1FhaHccG1hsANHNQk=
+script:
+- cp .ci/config.yml config.yml
+- docker run --rm -d --name instance --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro
+  -v $(pwd):/mnt --tmpfs /run --tmpfs /tmp geerlingguy/docker-debian10-ansible /lib/systemd/systemd
+- docker exec -it instance ansible-galaxy install -r /mnt/requirements.yml
+- docker exec -it instance ansible-playbook /mnt/playbook.yml -i /mnt/.ci/hosts.ini
+  --skip-tags notest
+after_success:
+- |
+  BRANCHES_TO_MERGE_REGEX='^develop' \
+    BRANCH_TO_MERGE_INTO=master \
+    GIT_REPO=${TRAVIS_REPO_SLUG} \
+    GIT_SERVER=github.com \
+    /tmp/merge.sh
