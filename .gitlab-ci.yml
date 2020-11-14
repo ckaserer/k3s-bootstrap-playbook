@@ -26,6 +26,5 @@ k3s:
     - python -V
     - pip -V
     - ansible --version
-    # add known_hosts entry
     - ansible-playbook playbook.yml -i hosts.ini
 ...

@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
     v.cpus = $CPU
   end
   
-  config.vm.network "private_network", ip: $IP, netmask: "24"
+  config.vm.network "private_network", ip: $IP
   config.vm.network "forwarded_port", guest: 22, host: $SSH, id: 'ssh'
 
   config.vm.synced_folder ".", "/vagrant", type: "rsync" #type: "nfs"
