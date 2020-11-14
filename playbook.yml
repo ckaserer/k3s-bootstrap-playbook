@@ -1,6 +1,16 @@
 ---
 
-- hosts: bastion
+- name: Prepare
+  hosts: bootstrap
+  become: true
+  tasks:
+
+    - name: Install sshpass
+      apt:
+        name: sshpass
+      
+- name: Bootstrap Bastion
+  hosts: bastion
   become: true
 
   vars_files:
@@ -11,6 +21,15 @@
       with_fileglob:
         - "{{ playbook_dir }}/config.yml"
       tags: ['always']
+
+    - name: Ensure known_hosts are set
+      lineinfile:
+        dest: ~/.ssh/known_hosts
+        create: yes
+        state: present
+        line: "{{ lookup('pipe', 'ssh-keyscan -t rsa '+inventory_hostname) }}"
+        regexp: "^{{ inventory_hostname }}"
+      delegate_to: localhost
 
     - name: "Set hostname to {{ bastion_hostname }}"
       hostname:
