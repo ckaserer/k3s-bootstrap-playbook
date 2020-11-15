@@ -24,12 +24,11 @@ dhcp_interface: eth0
 dhcp_subnets:
   - ip: 10.0.0.0
     netmask: 255.255.255.0
+    routers: "{{ bastion_ip }}"
     domain_name_servers:
       - "{{ bastion_ip }}"
     range_begin: 10.0.0.70
     range_end: 10.0.0.250
-    domain_name_servers: "{{ bastion_ip }}"
-    routers: "{{ bastion_ip }}"
 dhcp_hosts:
   - name: k3s
     mac: 'dc:a6:32:be:c7:a5'
