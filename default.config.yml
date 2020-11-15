@@ -25,13 +25,15 @@ dhcp_subnets:
   - ip: 10.0.0.0
     netmask: 255.255.255.0
     domain_name_servers:
-      - "10.0.0.1"
+      - "{{ bastion_ip }}"
     range_begin: 10.0.0.70
     range_end: 10.0.0.250
+    domain_name_servers: "{{ bastion_ip }}"
+    routers: "{{ bastion_ip }}"
 dhcp_hosts:
   - name: k3s
     mac: 'dc:a6:32:be:c7:a5'
-    ip: "10.0.0.1"
+    ip: "{{ bastion_ip }}"
   - name: master-0
     mac: 'dc:a6:32:b1:17:b6'
     ip: 10.0.0.10
