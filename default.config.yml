@@ -39,8 +39,11 @@ dhcp_hosts:
     mac: 'dc:a6:32:b1:17:c8'
     ip: 10.0.0.20
   - name: worker-1
-    mac: 'dc:a6:32:b1:17:12'
+    mac: 'dc:a6:32:b1:17:77'
     ip: 10.0.0.21
+  - name: worker-2
+    mac: 'dc:a6:32:b1:16:96'
+    ip: 10.0.0.22
 dhcp6_enable: false
 
 # bertvv.bind
