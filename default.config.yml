@@ -122,6 +122,10 @@ haproxy_backend:
       - dontlog-normal
     balance: source
     server:
+      - name: master-0
+        listen: '10.0.0.10:80'
+        param:
+          - check
       - name: worker-0
         listen: '10.0.0.20:80'
         param:
@@ -145,6 +149,10 @@ haproxy_backend:
       - dontlog-normal
     balance: source
     server:
+      - name: master-0
+        listen: '10.0.0.10:443'
+        param:
+          - check
       - name: worker-0
         listen: '10.0.0.20:443'
         param:
